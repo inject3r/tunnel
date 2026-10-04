@@ -1,0 +1,8 @@
+/build/
+/build-asan/
+/build-tsan/
+*.o
+*.a
+*.so
+core
+*.log

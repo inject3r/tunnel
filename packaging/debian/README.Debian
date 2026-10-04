@@ -1,0 +1,7 @@
+Tunnel installs the tunnel binary and systemd unit.
+
+Create a proxy list, then set it as the persistent default:
+  sudo /usr/bin/tunnel --set-proxy-file /etc/tunnel/proxies.txt
+
+The systemd service uses the persistent default and therefore does not need a
+proxy-list argument in the unit file.

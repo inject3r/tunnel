@@ -1,0 +1,21 @@
+# Maintainer: Tunnel Project
+pkgname=tunnel
+pkgver=1.1.0
+pkgrel=1
+pkgdesc='Linux proxy tunnel with nftables-backed global mode'
+arch=('x86_64' 'aarch64')
+url='https://github.com/inject3r/tunnel'
+license=('custom')
+depends=('nftables')
+optdepends=('systemd: service integration')
+source=()
+
+build() {
+  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DTUNNEL_STATIC_CXX=ON
+  cmake --build build -j"$(nproc)"
+}
+
+package() {
+  DESTDIR="$pkgdir" cmake --install build
+  install -Dm644 LICENSE-NOTICE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE-NOTICE.txt"
+}

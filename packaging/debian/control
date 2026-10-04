@@ -1,0 +1,14 @@
+Source: tunnel
+Section: net
+Priority: optional
+Maintainer: Tunnel Project
+Build-Depends: debhelper-compat (= 13), cmake, g++
+Standards-Version: 4.7.0
+Homepage: https://github.com/inject3r/tunnel
+
+Package: tunnel
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, nftables, systemd
+Description: Linux proxy tunnel and global transparent proxy
+ Tunnel provides SOCKS5/HTTP proxy pooling and a Linux nftables-backed
+ global transparent proxy mode.

@@ -1,0 +1,13 @@
+# One upstream proxy per line.
+# Supported schemes:
+#   http://host:port
+#   socks4://host:port
+#   socks4a://host:port
+#   socks5://host:port
+#   socks5h://host:port
+# Credentials:
+#   socks5://username:password@host:port
+# Keep this file private when it contains credentials.
+#
+# Example:
+# socks5://127.0.0.1:1080

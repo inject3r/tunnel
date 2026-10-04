@@ -1,0 +1,28 @@
+[Unit]
+Description=Tunnel global Linux proxy daemon
+Documentation=man:tunnel(1)
+After=network-online.target
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/env tunnel --daemon-global
+Restart=on-failure
+RestartSec=2s
+KillSignal=SIGTERM
+TimeoutStopSec=20s
+ExecStopPost=/usr/bin/env tunnel --emergency-disable-global
+LimitNOFILE=65535
+RuntimeDirectory=tunnel
+LogsDirectory=tunnel
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictSUIDSGID=true
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
+
+[Install]
+WantedBy=multi-user.target
