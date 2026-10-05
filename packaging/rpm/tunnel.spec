@@ -20,10 +20,7 @@ transparent proxy mode on Linux.
 %setup -q
 
 %build
-cmake -S . -B build \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DCMAKE_INSTALL_PREFIX=/usr \
-  -DTUNNEL_STATIC_CXX=ON
+cmake -S . -B build   -DCMAKE_BUILD_TYPE=Release   -DCMAKE_INSTALL_PREFIX=/usr
 cmake --build build --parallel
 
 %install
@@ -37,5 +34,5 @@ DESTDIR=%{buildroot} cmake --install build
 %{_datadir}/doc/tunnel/config/proxies.txt
 
 %changelog
-* Wed Oct 01 2026 Tunnel Project - 1.1.0-1
+* Mon Oct 05 2026 Tunnel Project - 1.1.0-1
 - Initial distro package.
