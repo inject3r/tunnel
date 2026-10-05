@@ -102,7 +102,7 @@ jobs:
             -e VERSION="$version" \
             -v "$GITHUB_WORKSPACE:/src:ro" \
             -v "$out:/out" \
-            debian:11-slim bash -euxo pipefail -c '
+            debian:12-slim bash -euxo pipefail -c '
               apt-get update
               DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ make ca-certificates
               cd /src
@@ -163,12 +163,12 @@ jobs:
           - id: arch-x86_64
             runner: ubuntu-24.04
             platform: linux/amd64
-            image: archlinux:base
+            image: archlinuxarm/base
             kind: arch
           - id: arch-aarch64
             runner: ubuntu-24.04-arm
             platform: linux/arm64
-            image: archlinux:base
+            image: archlinuxarm/base
             kind: arch
           - id: alpine-x86_64
             runner: ubuntu-24.04
