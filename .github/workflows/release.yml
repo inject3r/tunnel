@@ -104,7 +104,10 @@ jobs:
             -v "$out:/out" \
             debian:11-slim bash -euxo pipefail -c '
               rm -rf /etc/apt/sources.list.d/*
-              printf "%s\\n" "deb [trusted=yes check-valid-until=no] http://archive.debian.org/debian bullseye main" > /etc/apt/sources.list
+              printf "%s\\n" \
+                "deb [trusted=yes check-valid-until=no] http://archive.debian.org/debian bullseye main" \
+                "deb [trusted=yes check-valid-until=no] http://archive.debian.org/debian-security bullseye-security main" \
+                > /etc/apt/sources.list
               apt-get -o Acquire::Check-Valid-Until=false update
               DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ make ca-certificates
               cd /src
@@ -233,7 +236,10 @@ jobs:
                   sed -i "s/^pkgver=.*/pkgver=$VERSION/" PKGBUILD
                   useradd -m builder
                   chown -R builder:builder /tmp/tunnel /out
-                  su builder -c "cd /tmp/tunnel/packaging/arch && makepkg --noconfirm --syncdeps --nocheck --clean --pkgdest /out"
+                  su builder -c "cd /tmp/tunnel/packaging/arch && makepkg --noconfirm --syncdeps --nocheck --clean"
+                  pkg="$(find /tmp/tunnel -type f -name 'tunnel-*.pkg.tar.zst' -print -quit)"
+                  test -n "$pkg"
+                  cp "$pkg" /out/
                 '
               ;;
             musl)
@@ -277,6 +283,7 @@ jobs:
         with:
           path: release-assets
           merge-multiple: true
+          pattern: '*'
 
       - name: Build source archive and documentation asset
         shell: bash
