@@ -300,7 +300,7 @@ jobs:
                   pkg="$(find /out \
                     -maxdepth 1 \
                     -type f \
-                    -name "tunnel-${VERSION}-*.pkg.tar.zst" \
+                    -name "tunnel-${VERSION}-*.pkg.tar.*" \
                     ! -name "tunnel-debug-*" \
                     -print -quit)"
 
