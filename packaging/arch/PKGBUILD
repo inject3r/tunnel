@@ -11,11 +11,23 @@ optdepends=('systemd: service integration')
 source=()
 
 build() {
-  cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr -DTUNNEL_STATIC_CXX=ON
-  cmake --build build -j"$(nproc)"
+  local root="$startdir/../.."
+
+  cmake -S "$root" \
+        -B "$srcdir/build" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DTUNNEL_STATIC_CXX=ON
+
+  cmake --build "$srcdir/build" -j"$(nproc)"
 }
 
 package() {
-  DESTDIR="$pkgdir" cmake --install build
-  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  local root="$startdir/../.."
+
+  DESTDIR="$pkgdir" cmake --install "$srcdir/build"
+
+  install -Dm644 \
+    "$root/LICENSE" \
+    "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

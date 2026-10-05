@@ -102,8 +102,12 @@ jobs:
             -e VERSION="$version" \
             -v "$GITHUB_WORKSPACE:/src:ro" \
             -v "$out:/out" \
-            debian:12-slim bash -euxo pipefail -c '
-              apt-get update
+            debian:11-slim bash -euxo pipefail -c '
+              rm -f /etc/apt/sources.list.d/debian.sources
+              cat > /etc/apt/sources.list <<EOF
+              deb http://archive.debian.org/debian bullseye main
+              EOF
+              apt-get -o Acquire::Check-Valid-Until=false update
               DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ make ca-certificates
               cd /src
               VERSION="$VERSION" packaging/release/build-tarball.sh "/out/tunnel-$VERSION-${{ matrix.arch }}-portable-glibc.tar.gz" portable-glibc
@@ -163,12 +167,12 @@ jobs:
           - id: arch-x86_64
             runner: ubuntu-24.04
             platform: linux/amd64
-            image: archlinuxarm/base
+            image: archlinux:base
             kind: arch
           - id: arch-aarch64
             runner: ubuntu-24.04-arm
             platform: linux/arm64
-            image: archlinuxarm/base
+            image: menci/archlinuxarm:base
             kind: arch
           - id: alpine-x86_64
             runner: ubuntu-24.04
@@ -224,13 +228,13 @@ jobs:
                 -v "$GITHUB_WORKSPACE:/src:ro" \
                 -v "$out:/out" \
                 '${{ matrix.image }}' bash -euxo pipefail -c '
-                  pacman -Sy --noconfirm --needed base-devel cmake
+                  pacman -Syu --noconfirm --needed base-devel cmake
                   cp -a /src /tmp/tunnel
-                  cd /tmp/tunnel
-                  sed -i "s/^pkgver=.*/pkgver=$VERSION/" packaging/arch/PKGBUILD
+                  cd /tmp/tunnel/packaging/arch
+                  sed -i "s/^pkgver=.*/pkgver=$VERSION/" PKGBUILD
                   useradd -m builder
                   chown -R builder:builder /tmp/tunnel /out
-                  su builder -c "cd /tmp/tunnel && makepkg --noconfirm --syncdeps --nocheck --clean"
+                  su builder -c "cd /tmp/tunnel/packaging/arch && makepkg --noconfirm --syncdeps --nocheck --clean"
                   cp /tmp/tunnel/packaging/arch/tunnel-*.pkg.tar.zst /out/
                 '
               ;;
