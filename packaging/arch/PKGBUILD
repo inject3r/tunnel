@@ -5,7 +5,7 @@ pkgrel=1
 pkgdesc='Linux proxy tunnel with nftables-backed global mode'
 arch=('x86_64' 'aarch64')
 url='https://github.com/inject3r/tunnel'
-license=('custom')
+license=('MIT')
 depends=('nftables')
 optdepends=('systemd: service integration')
 source=()
@@ -17,5 +17,5 @@ build() {
 
 package() {
   DESTDIR="$pkgdir" cmake --install build
-  install -Dm644 LICENSE-NOTICE.txt "$pkgdir/usr/share/licenses/$pkgname/LICENSE-NOTICE.txt"
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 }

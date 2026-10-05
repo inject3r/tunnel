@@ -2,7 +2,7 @@
 set -euo pipefail
 BIN=${1:-./build/tunnel}
 [[ -x "$BIN" ]]
-[[ "$($BIN --version)" == "Tunnel 1.1.0" ]]
+[[ "$("$BIN" --version)" == "Tunnel 1.1.0" ]]
 $BIN --doctor >/tmp/tunnel-doctor.out
 cat /tmp/tunnel-doctor.out
 rm -f /tmp/tunnel-doctor.out

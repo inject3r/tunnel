@@ -23,6 +23,6 @@ cmake --build "$WORK/build" --parallel
 DESTDIR="$WORK/root" cmake --install "$WORK/build"
 mkdir -p "$(dirname "$OUT")"
 mkdir -p "$WORK/archive"
-# Keep a flat top-level /usr tree so the archive can be unpacked into /. 
+# Keep a flat top-level /usr tree so the archive can be unpacked into /.
 tar -C "$WORK/root" -czf "$OUT" .
 echo "Built $OUT"

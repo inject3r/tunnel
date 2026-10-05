@@ -33,8 +33,6 @@ Build from source with CMake, Make, or the included `build.sh` script.
 ./tests/nft-syntax.sh
 ```
 
-The `nft` syntax test exits 77 when nftables is not installed on the build host.
-
 ## CLI helpers
 
 ```bash

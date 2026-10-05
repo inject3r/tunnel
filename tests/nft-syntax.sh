@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
 if ! command -v nft >/dev/null 2>&1; then
   echo "nft is not installed; syntax test SKIPPED (exit 77)"
   exit 77
 fi
+
 TMP=$(mktemp)
 trap 'rm -f "$TMP"' EXIT
+
 cat > "$TMP" <<'NFT'
 table ip tunnel_syntax_test {
   chain output_nat {
@@ -38,5 +41,14 @@ table ip6 tunnel_syntax_test6 {
   }
 }
 NFT
-nft -c -f "$TMP"
+
+if [[ "$EUID" -eq 0 ]]; then
+  nft -c -f "$TMP"
+elif sudo -n true 2>/dev/null; then
+  sudo -n nft -c -f "$TMP"
+else
+  echo "nft syntax test SKIPPED: CAP_NET_ADMIN/root privilege is unavailable (exit 77)"
+  exit 77
+fi
+
 echo "nft syntax: PASS"

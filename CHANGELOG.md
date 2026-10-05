@@ -16,9 +16,6 @@
 - Added native x86_64/aarch64 GitHub Actions release matrix.
 - Added SHA-256 release checksums and source archive generation.
 - Made the systemd unit resolve the installed `tunnel` binary through a standard PATH instead of hard-coding `/usr/local/bin`.
-
-## 1.1.0
-
 - Added first-class local Tor integration via `--tor`, `--tor-port`, `--tor-host`, `--tor-browser`, `--tor-isolate`, and `--tor-check`.
 - `--tor` uses `socks5h://` so hostname resolution can remain inside Tor by default.
 - Fixed fixed-upstream usage: `--proxy` and `--tor` no longer require a proxy-list file.

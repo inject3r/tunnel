@@ -598,9 +598,11 @@ bool global_firewall_active() {
 std::string endpoint_string(const sockaddr_storage& ss) {
     char host[NI_MAXHOST]{};
     char serv[NI_MAXSERV]{};
-    socklen_t len = (ss.ss_family == AF_INET) ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
-    if (::getnameinfo(reinterpret_cast<const sockaddr*>(&ss), len, host, sizeof host, serv, sizeof serv,
-                      NI_NUMERICHOST | NI_NUMERICSERV) != 0) return "?";
+    socklen_t sl = ss.ss_family == AF_INET ? sizeof(sockaddr_in) : sizeof(sockaddr_in6);
+    if (::getnameinfo(reinterpret_cast<const sockaddr*>(&ss), sl,
+                      host, sizeof host, serv, sizeof serv,
+                      NI_NUMERICHOST | NI_NUMERICSERV) != 0)
+        return "?";
     return std::string(host) + ":" + serv;
 }
 
@@ -763,7 +765,7 @@ public:
         else relay_port=ntohs(reinterpret_cast<sockaddr_in6*>(&relay)->sin6_port);
         if(relay_port==0) return fail(err,"SOCKS5 UDP relay returned port 0");
         if(relay.ss_family==AF_INET && reinterpret_cast<sockaddr_in*>(&relay)->sin_addr.s_addr==INADDR_ANY){ struct addrinfo hints{}; hints.ai_family=AF_INET; hints.ai_socktype=SOCK_DGRAM; struct addrinfo* ar=nullptr; if(::getaddrinfo(proxy.host.c_str(),std::to_string(relay_port).c_str(),&hints,&ar)!=0||!ar) return fail(err,"cannot resolve UDP proxy host"); auto* r=reinterpret_cast<sockaddr_in*>(ar->ai_addr); r->sin_port=htons(relay_port); std::memcpy(&relay,r,sizeof *r); relay_len=sizeof(sockaddr_in); ::freeaddrinfo(ar); }
-        if(relay.ss_family==AF_INET6 && IN6_IS_ADDR_UNSPECIFIED(&reinterpret_cast<sockaddr_in6*>(&relay)->sin6_addr)){ struct addrinfo hints{}; hints.ai_family=AF_INET6; hints.ai_socktype=SOCK_DGRAM; struct addrinfo* ar=nullptr; if(::getaddrinfo(proxy.host.c_str(),std::to_string(relay_port).c_str(),&hints,&ar)!=0||!ar) return fail(err,"cannot resolve UDP proxy host"); auto* r=reinterpret_cast<sockaddr_in6*>(ar->ai_addr); r->sin6_port=htons(relay_port); std::memcpy(&relay,r,sizeof *r); relay_len=sizeof(sockaddr_in6); ::freeaddrinfo(ar); }
+        if(relay.ss_family==AF_INET6 && IN6_IS_ADDR_UNSPECIFIED(&reinterpret_cast<sockaddr_in6*>(&relay)->sin6_addr)){ struct addrinfo hints{}; hints.ai_family=AF_INET6; hints.ai_socktype=SOCK_DGRAM; struct addrinfo* ar=nullptr; if(::getaddrinfo(proxy.host.c_str(),std::to_string(relay_port).c_str(),&hints,&ar)!=0||!ar) return fail(err,"cannot resolve UDP proxy host"); auto* r=reinterpret_cast<sockaddr_in6*>(ar->ai_addr); r->sin6_port=htons(relay_port); std::memcpy(&relay,r,sizeof(sockaddr_in6)); relay_len=sizeof(sockaddr_in6); ::freeaddrinfo(ar); }
         udp_fd_=::socket(relay.ss_family,SOCK_DGRAM,0); if(udp_fd_<0) return fail(err,"SOCKS5 UDP socket(): "+std::string(strerror(errno)));
         if(!mark_socket_if_needed(udp_fd_)){return fail(err,"SO_MARK failed for SOCKS5 UDP socket");}
         if(::connect(udp_fd_,reinterpret_cast<sockaddr*>(&relay),relay_len)!=0) return fail(err,"connect UDP relay failed: "+std::string(strerror(errno)));
@@ -790,7 +792,6 @@ private:
     std::shared_ptr<ProxyPool> pool_; int listener_fd_; sockaddr_storage client_{}; socklen_t client_len_=0; double timeout_; bool verbose_;
     Stream control_; int udp_fd_=-1; sockaddr_storage relay_{}; socklen_t relay_len_=0; std::atomic<bool> running_{false}; std::thread thread_; std::atomic<double> last_activity_{0.0};
 };
-
 class DnsProxyServer {
 public:
     DnsProxyServer(std::shared_ptr<ProxyPool> pool, uint16_t port, double timeout, bool verbose)
