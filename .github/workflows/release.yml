@@ -42,7 +42,7 @@ jobs:
         run: |
           set -euo pipefail
           tag_version="${GITHUB_REF_NAME#v}"
-          cmake_version="$(sed -n 's/^project(tunnel VERSION \([^)]*\).*/\1/p' CMakeLists.txt | head -1)"
+          cmake_version="$(sed -n 's/^project(tunnel VERSION \([^[:space:])]*\).*/\1/p' CMakeLists.txt | head -1)"
           source_version="$(sed -n 's/.*kVersion = "\([^"]*\)".*/\1/p' src/tunnel/config.h | head -1)"
           [[ -n "$cmake_version" && -n "$source_version" ]]
           [[ "$tag_version" == "$cmake_version" ]]
