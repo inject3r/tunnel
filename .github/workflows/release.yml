@@ -103,13 +103,14 @@ jobs:
             -v "$GITHUB_WORKSPACE:/src:ro" \
             -v "$out:/out" \
             debian:11-slim bash -euxo pipefail -c '
-              rm -f /etc/apt/sources.list.d/debian.sources
-              printf '%s\\n' 'deb http://archive.debian.org/debian bullseye main' > /etc/apt/sources.list
+              rm -rf /etc/apt/sources.list.d/*
+              printf "%s\\n" "deb [trusted=yes check-valid-until=no] http://archive.debian.org/debian bullseye main" > /etc/apt/sources.list
               apt-get -o Acquire::Check-Valid-Until=false update
               DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends cmake g++ make ca-certificates
               cd /src
               VERSION="$VERSION" packaging/release/build-tarball.sh "/out/tunnel-$VERSION-${{ matrix.arch }}-portable-glibc.tar.gz" portable-glibc
             '
+          test -s "$out/tunnel-$version-${{ matrix.arch }}-portable-glibc.tar.gz"
 
       - name: Assert portable glibc ceiling
         shell: bash
@@ -155,12 +156,12 @@ jobs:
           - id: fedora-x86_64
             runner: ubuntu-24.04
             platform: linux/amd64
-            image: fedora:latest
+            image: fedora:44
             kind: rpm
           - id: fedora-aarch64
             runner: ubuntu-24.04-arm
             platform: linux/arm64
-            image: fedora:latest
+            image: fedora:44
             kind: rpm
           - id: arch-x86_64
             runner: ubuntu-24.04
@@ -215,7 +216,7 @@ jobs:
                 -v "$GITHUB_WORKSPACE:/src:ro" \
                 -v "$out:/out" \
                 '${{ matrix.image }}' bash -euxo pipefail -c '
-                  dnf install -y cmake gcc-c++ make rpm-build findutils
+                  dnf --setopt=retries=5 --setopt=max_parallel_downloads=4 install -y cmake gcc-c++ make rpm-build findutils
                   cd /src
                   VERSION="$VERSION" packaging/rpm/build-rpm.sh "/out/tunnel-$VERSION-${{ matrix.id }}.rpm"
                 '
@@ -232,8 +233,7 @@ jobs:
                   sed -i "s/^pkgver=.*/pkgver=$VERSION/" PKGBUILD
                   useradd -m builder
                   chown -R builder:builder /tmp/tunnel /out
-                  su builder -c "cd /tmp/tunnel/packaging/arch && makepkg --noconfirm --syncdeps --nocheck --clean"
-                  cp /tmp/tunnel/packaging/arch/tunnel-*.pkg.tar.zst /out/
+                  su builder -c "cd /tmp/tunnel/packaging/arch && makepkg --noconfirm --syncdeps --nocheck --clean --pkgdest /out"
                 '
               ;;
             musl)

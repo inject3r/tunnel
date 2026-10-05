@@ -31,7 +31,7 @@ DESTDIR=%{buildroot} cmake --install build
 %license %{_datadir}/doc/tunnel/LICENSE
 %{_bindir}/tunnel
 %{_prefix}/lib/systemd/system/tunnel.service
-%{_datadir}/doc/tunnel/config/proxies.txt
+%{_datadir}/doc/tunnel/proxies.txt
 
 %changelog
 * Mon Oct 05 2026 Tunnel Project - 1.1.0-1
